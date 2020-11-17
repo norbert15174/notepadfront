@@ -2,7 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 import Items from './noteitems/items';
 import {MdAddCircle} from 'react-icons/md';
-
+import AddItem from './noteitems/additem';
+import {GrClose} from 'react-icons/gr';
 
 const NoteContener = styled.div`
 
@@ -28,11 +29,27 @@ const AddNote = styled(MdAddCircle)`
 
 `;
 
+const ExitButton = styled(GrClose)`
+
+    font-size: 40px;
+    font-weight: 700;
+    padding: 10px 10px 10px 10px;
+    position: fixed;
+    top: calc(10% + 20px);
+    right: calc(10% + 20px);
+    cursor: pointer;
+    z-index: 200;
+
+`;
+
+
 class Note extends React.Component{
 
     state = {
         data: '',
-        ready:'no'
+        ready:'no',
+        additem: 'no',
+        modifyitem: 'no'
     }
 
     async componentDidMount() {
@@ -42,6 +59,12 @@ class Note extends React.Component{
       }
     
 
+      handleItem(){
+              this.setState({
+                  additem: this.state.additem === 'no' ? 'yes' : 'no',
+              })
+          
+      }
 
     render(){
         return(
@@ -53,8 +76,11 @@ class Note extends React.Component{
                <Items dane={dane}></Items>
             ))} 
             </NoteContener>
-            <AddNote></AddNote>
+            {this.state.additem === 'yes' ? <><AddItem></AddItem> <ExitButton onClick={e => this.handleItem()}></ExitButton></> : null}
+            <AddNote onClick={e => this.handleItem()}></AddNote>
+            
             </>:null}
+            
             </>
         )
     }
