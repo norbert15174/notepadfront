@@ -24,7 +24,7 @@ const Form = styled.div`
     top: 10vh;
     left: 10vw;
     z-index: 120;
-    background-color: white;
+    background: #282828;
     opacity: 1;
     transition: opacity 1s;
 
@@ -38,6 +38,13 @@ const AddItemInput = styled.input`
     padding: 10px 10px 10px 10px;
     margin-left: calc(30% - 10px);
     margin-bottom: 2%;
+    background-color: #434343;
+    color: white;
+    outline-style: none;
+    border-radius: 5px;
+    &:focus{
+        border: 2px solid #2c5364;
+    }
 
 
 `;
@@ -47,6 +54,7 @@ const HeaderOfItem = styled.h1`
     text-align: center;
     margin-top: 5%;
     margin-bottom: 2%;
+    color: white;
 
 `;
 
@@ -57,17 +65,23 @@ const ContentToAdd = styled.textarea`
     padding: 10px 10px 10px 10px;
     margin-left: calc(30% - 10px);
     margin-bottom: 2%;
-
-
+    background-color: #434343;
+    color: white;
+    outline-style: none;
+    border-radius: 5px;
+    &:focus{
+        border: 2px solid #2c5364;
+    }
 `;
 const ItemLabel = styled.label`
     display: block;
     width: 60%;
     margin-left: calc(30% - 10px);
-    color: #cc9900;
+    color: #2c5364;
     padding: 10px 10px 10px 10px;
     font-size: 18px;
     font-weight: 500;
+    
     
 
 `;
@@ -77,13 +91,14 @@ const ButtonAdd = styled.button`
     width: 250px;
     margin-left: calc(50% - 125px);
     padding: 15px 15px 15px 15px;
-    background-color: #cc9900;
+    background: #2c5364;
     border-radius: 5px;
     color: white;
     font-size: 22px;
     font-weight: 700;
     cursor: pointer;
     outline-style: none;
+    border: none;
 
 
 `;
@@ -93,6 +108,7 @@ function AddItem(props){
     const [topic, setTopic] = useState("");
     const [author, setAuthor] = useState("");
     const [content, setContent] = useState("");
+    const [id, setId] = useState(-1);
 
     async function handleItemAdd() {
         await fetch("http://localhost:8200/notes", {
@@ -110,18 +126,39 @@ function AddItem(props){
         });
         window.location.reload();
       }
+      async function handleItemUpdate() {
+        await fetch("http://localhost:8200/notes", {
+          method: "put",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            noteId: id,
+            topic: topic,
+            author: {
+                author: author,
+            },
+            content: content
+          }),
+        });
+        window.location.reload();
+      }
 
         return(
             <FormWrapper>
+                {
+                    props.update && id === -1 ? (setId(props.update.noteId),setAuthor(props.update.author.author),setTopic(props.update.topic),setContent(props.update.content)) : null                   
+                }
                 <Form>
-                    <HeaderOfItem>Add New Note</HeaderOfItem>
+                    <HeaderOfItem>{props.update ? "Modify Note" : "Add New Note"}</HeaderOfItem>
                     <ItemLabel>Topic</ItemLabel>
-                    <AddItemInput onChange={(e) => setTopic(e.target.value)}></AddItemInput>
+                    <AddItemInput onChange={(e) => setTopic(e.target.value)} value={topic} ></AddItemInput>
                     <ItemLabel>Author</ItemLabel>
-                    <AddItemInput onChange={(e) => setAuthor(e.target.value)}></AddItemInput>
+                    <AddItemInput onChange={(e) => setAuthor(e.target.value)} value={author} disabled={props.update ? true : false}></AddItemInput>
                     <ItemLabel>Content</ItemLabel>
-                    <ContentToAdd onChange={(e) => setContent(e.target.value)}></ContentToAdd>
-                    <ButtonAdd onClick={handleItemAdd}>Add Note</ButtonAdd>
+                    <ContentToAdd onChange={(e) => setContent(e.target.value)} value={content} ></ContentToAdd>
+                    {props.update ? <ButtonAdd onClick={handleItemUpdate}>Modify Note</ButtonAdd> : <ButtonAdd onClick={handleItemAdd}>Add Note</ButtonAdd>}
+                    
                 </Form>
             </FormWrapper> 
     )
