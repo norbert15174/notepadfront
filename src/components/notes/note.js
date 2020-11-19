@@ -5,10 +5,11 @@ import { MdAddCircle } from "react-icons/md";
 import AddItem from "./noteitems/additem";
 import { GrClose } from "react-icons/gr";
 import { FaSearch } from "react-icons/fa";
-
+import Weather from "./../weather/weather";
+import {TiWeatherCloudy} from "react-icons/ti";
 const NoteContener = styled.div`
-  width: 100vw;
-  min-height: calc(100vh - 50px);
+  width: calc(100vw -25px);
+  min-height: calc(100vh - 150px);
   display: grid;
   grid-template-columns: 25% 25% 25% 25%;
   grid-auto-rows: 50vh;
@@ -35,7 +36,15 @@ const ExitButton = styled(GrClose)`
   top: calc(10% + 20px);
   right: calc(10% + 20px);
   cursor: pointer;
-  z-index: 200;
+  z-index: 500;
+  opacity: 1;
+  animation: show 2s ease-in-out;
+  
+  @keyframes show {
+  0% {opacity: 0;}
+  50% {opacity: 0;}
+  100% {opacity: 1;}
+}
 `;
 
 const Search = styled.input`
@@ -76,6 +85,21 @@ const SearchIcon = styled(FaSearch)`
   cursor: pointer;
 `;
 
+const WeatherIcon = styled(TiWeatherCloudy)`
+
+    font-size: 40px;
+    position: absolute;
+    top:20px;
+    left: 50px;
+    background-color: black;
+    color: white;
+    padding: 10px 10px 10px 10px;
+    border-radius: 50%;
+    cursor: pointer;
+
+
+`;
+
 class Note extends React.Component {
   state = {
     data: "",
@@ -83,6 +107,7 @@ class Note extends React.Component {
     additem: "no",
     modifyitem: "no",
     clicked: "no",
+    weather: "no",
   };
   async componentDidMount() {
     await fetch("http://localhost:8200/notes")
@@ -91,6 +116,11 @@ class Note extends React.Component {
         this.setState({
           data,
           ready: "yes",
+        })
+      )
+      .catch((error) =>
+        this.setState({
+          ready: "no",
         })
       );
   }
@@ -103,6 +133,11 @@ class Note extends React.Component {
   handleClick() {
     this.setState({
       clicked: this.state.clicked === "yes" ? "no" : "yes",
+    });
+  }
+  handleWeather() {
+    this.setState({
+      weather: this.state.weather === "yes" ? "no" : "yes",
     });
   }
 
@@ -122,7 +157,10 @@ class Note extends React.Component {
   render() {
     return (
       <>
+        {this.state.weather === "yes" ? <><Weather></Weather> <ExitButton onClick={(e) => this.handleWeather()}></ExitButton></> : null}
+        
         <SearchContainer>
+        <WeatherIcon onClick={(e) => this.handleWeather(e)}></WeatherIcon>
           <Search
             placeholder="search..."
             isclick={this.state.clicked}
